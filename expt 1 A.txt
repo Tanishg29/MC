@@ -1,0 +1,38 @@
+
+c1 = [1,1,1,1];
+c2 = [1,-1,1,-1];
+c3 = [1,1,-1,-1];
+c4 = [1,-1,-1,1];
+rc = [];
+
+printf("Enter the data bits :\n"); 
+d1 = input("Enter D1 :"); 
+d2 = input("Enter D2 :"); 
+d3 = input("Enter D3 :"); 
+d4 = input("Enter D4 :"); 
+
+r1 = c1 * d1; 
+r2 = c2 * d2; 
+r3 = c3 * d3; 
+r4 = c4 * d4; 
+
+resultant_channel = r1 + r2 + r3 + r4;
+printf("Resultant Channel: %s\n", mat2str(resultant_channel));
+
+Channel = input("Enter the station to listen for C1=1 ,C2=2, C3=3 C4=4 : "); 
+if Channel == 1
+    rc = c1;
+elseif Channel == 2
+    rc = c2;
+elseif Channel == 3
+    rc = c3;
+elseif Channel == 4
+    rc = c4;
+end
+
+inner_product = resultant_channel .* rc; 
+printf("Inner Product: %s\n", mat2str(inner_product)); 
+
+res1 = sum(inner_product); 
+data = res1 / length(inner_product); 
+printf("Data bit that was sent: %f\n", data);

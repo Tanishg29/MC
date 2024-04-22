@@ -1,0 +1,69 @@
+clear
+N = 10^6; % number of bits or symbols
+rng(100); % initializing the random number generator
+randn('state',200); % initializing the randn() function
+
+% Transmitter
+ip = rand(1,N)>0.5; % generating 0,1 with equal probability
+s = 2*ip-1; % BPSK modulation 0 -> -1; 1 -> 1
+
+% AWGN Channel
+n_AWGN = 1/sqrt(2)*[randn(1,N) + 1i*randn(1,N)]; % white Gaussian noise, 0dB variance
+
+Eb_N0_dB = (-3:10); % multiple Eb/N0 values
+
+% AWGN Simulation
+nErr_AWGN = zeros(size(Eb_N0_dB));
+for ii = 1:length(Eb_N0_dB)
+    % Noise addition
+    y_AWGN = s + 10^(-Eb_N0_dB(ii)/20)*n_AWGN; % additive white Gaussian noise
+    % Receiver - hard decision decoding
+    ipHat_AWGN = real(y_AWGN)>0;
+    % Counting the errors
+    nErr_AWGN(ii) = sum(ip ~= ipHat_AWGN);
+end
+simBer_AWGN = nErr_AWGN/N; % simulated BER
+theoryBer_AWGN = 0.5*erfc(sqrt(10.^(Eb_N0_dB/10))); % theoretical BER for AWGN
+
+% Plot AWGN
+figure
+semilogy(Eb_N0_dB, theoryBer_AWGN,'b.-');
+hold on
+semilogy(Eb_N0_dB, simBer_AWGN,'mx-');
+axis([-3 10 1e-5 0.5])
+grid on
+legend('AWGN Theory', 'AWGN Simulation');
+xlabel('Eb/No, dB');
+ylabel('Bit Error Rate');
+title('Bit error probability curve for BPSK modulation in AWGN channel');
+
+% Rayleigh Channel
+h = 1/sqrt(2)*[randn(1,N) + 1i*randn(1,N)]; % Rayleigh fading channel
+n_AWGN = 1/sqrt(2)*[randn(1,N) + 1i*randn(1,N)]; % white Gaussian noise, 0dB variance
+n_Rayleigh = h.*n_AWGN; % multiply by Rayleigh fading coefficients
+
+% Rayleigh Simulation
+nErr_Rayleigh = zeros(size(Eb_N0_dB));
+for ii = 1:length(Eb_N0_dB)
+    % Noise addition
+    y_Rayleigh = s + 10^(-Eb_N0_dB(ii)/20)*n_Rayleigh; % additive noise in Rayleigh channel
+    % Receiver - hard decision decoding
+    ipHat_Rayleigh = real(y_Rayleigh)>0;
+    % Counting the errors
+    nErr_Rayleigh(ii) = sum(ip ~= ipHat_Rayleigh);
+end
+simBer_Rayleigh = nErr_Rayleigh/N; % simulated BER
+theoryBer_Rayleigh = 0.5*(1-sqrt(10.^(Eb_N0_dB/10)./(1+10.^(Eb_N0_dB/10)))); % theoretical BER for Rayleigh
+
+% Plot Rayleigh
+figure
+semilogy(Eb_N0_dB, theoryBer_AWGN,'b.-');
+hold on
+semilogy(Eb_N0_dB, theoryBer_Rayleigh,'g--');
+semilogy(Eb_N0_dB, simBer_Rayleigh,'r.-','MarkerSize',4); % Reduce marker size
+axis([-3 10 1e-5 0.5])
+grid on
+legend('AWGN Theory', 'Rayleigh Theory', 'Rayleigh Simulation');
+xlabel('Eb/No, dB');
+ylabel('Bit Error Rate');
+title('Bit error probability curve for BPSK modulation in Rayleigh fading channel');

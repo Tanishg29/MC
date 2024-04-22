@@ -1,0 +1,10 @@
+en
+conf t
+int fa0/1
+ip address 187.121.0.1 255.255.255.0
+no shutdown
+
+do write memory
+ip dhcp pool net1
+network 187.121.0.1 255.255.255.0
+exit

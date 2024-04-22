@@ -1,0 +1,35 @@
+# client code
+import socket
+soc=socket.socket()
+host = input(str("Enter Host Address:"))
+port = 8084
+soc.connect((host,port))
+print("Connected To Server")
+incFile = input(str("Enter Incoming File Name:"))
+file= open(incFile, 'wb')
+incFileDat =soc.recv(1024)
+file.write (incFileDat)
+file.close()
+print("File Recieved")
+f = open(incFile, 'r')
+recFileContent = f.read()
+print("Recieved File Is:",recFileContent)
+
+# server code
+
+import socket
+import os
+soc = socket.socket()
+host = "127.0.0.1"
+port = 8084
+soc.bind((host,port))
+soc.listen(1)
+print("Host Name:",host)
+print("Waiting For Client To Connect")
+conn, addr =soc.accept()
+print(addr, "Client Has Connected To Server")
+fileName = input(str("File Name:"))
+file = open(fileName, 'rb')
+fileData = file.read(1024)
+conn.send(fileData)
+print("File Sent")
